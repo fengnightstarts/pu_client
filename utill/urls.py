@@ -1,0 +1,5 @@
+LOGIN = "https://apis.pocketuni.net/uc/user/login"
+JOIN_ACTIVITY = "https://apis.pocketuni.net/apis/activity/join"
+ACTIVITY_INFO = "https://apis.pocketuni.net/apis/activity/info"
+ACTIVITY_LIST = "https://apis.pocketuni.net/apis/activity/list"
+SCHOOL_LIST = "https://pocketuni.net/index.php?app=api&mod=Sitelist&act=getSchools"
