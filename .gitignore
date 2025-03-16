@@ -4,3 +4,6 @@
 /.venv/
 /user_data.json
 /代码/
+/build/
+/dist/
+/main.spec

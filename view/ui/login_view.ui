@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>370</width>
+    <width>476</width>
     <height>379</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>11</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -137,6 +143,24 @@
       </property>
      </spacer>
     </item>
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>  作者：星夜不荟</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -151,10 +175,22 @@
     <bool>false</bool>
    </attribute>
    <addaction name="flush_school_lists_action"/>
+   <addaction name="project_action"/>
   </widget>
   <action name="flush_school_lists_action">
    <property name="text">
     <string>刷新学校列表</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="project_action">
+   <property name="text">
+    <string>项目地址</string>
+   </property>
+   <property name="toolTip">
+    <string>本项目完全免费，喜欢请到我的github给个免费的star吧</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

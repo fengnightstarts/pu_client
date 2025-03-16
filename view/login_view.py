@@ -4,6 +4,8 @@ from PySide6.QtCore import Signal, Slot
 from utill.bean import User, School, login_method, commands, Message
 from view.models import SchoolModel
 import app.main
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtCore import QUrl
 
 
 class login_window(QMainWindow):
@@ -46,8 +48,12 @@ class login_window(QMainWindow):
         self.ui.flush_school_lists_action.triggered.connect(
             lambda: app.main.push_msg(Message(commands.get_school_list))
         )
+        self.ui.project_action.triggered.connect(
+            lambda: QDesktopServices.openUrl(
+                QUrl("https://github.com/fengnightstarts/pu_client/")
+            )
+        )
 
-    def get_login_method(self):
         if self.ui.auto_loginRadioButton.isChecked():
             return login_method.auto_login
         elif self.ui.use_this_token_RadioButton.isChecked():
