@@ -2,7 +2,7 @@ import PySide6.QtWidgets
 from queue import Queue
 import threading
 import view
-import log
+import utill
 import app.main
 import view.log_view
 
@@ -13,7 +13,7 @@ def main():
     login_window = view.login_view.login_window()
     main_window = view.main_view.main_window()
     log_window = view.log_view.log_window()
-    log.log_to_window.init(log_window)
+    utill.log_to_window.init(log_window)
     log_window.show()
     t = threading.Thread(
         target=app.main.start,

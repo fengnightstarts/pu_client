@@ -8,7 +8,7 @@ import threading
 import concurrent.futures
 import asyncio
 from .scheduler_model import event_manager
-from log.log_to_window import add_log
+from utill.log_to_window import add_log
 
 __msg_queue: Queue = None
 user: bean.User = None
@@ -381,8 +381,6 @@ def load_config():
         add_log(f"ERROR app.main.load_config 加载配置失败\n{e}")
     user = user_data_manager.get_user()
     config = user_data_manager.get_config()
-
-    add_log(f"INFO 加载配置\n user:{user.to_dict()}\nconfig:{config.to_dict()}")
     login_window.load_config(user)
     main_window.load_config(config)
 

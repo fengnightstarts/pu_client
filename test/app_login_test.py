@@ -3,7 +3,7 @@ import app.main
 from view import *
 import PySide6.QtWidgets
 import threading
-from log import log_to_window
+from logger import log_to_window
 
 
 def main():

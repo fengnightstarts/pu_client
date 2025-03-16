@@ -2,7 +2,7 @@ import threading
 import time
 import schedule
 from datetime import datetime
-from log.log_to_window import add_log
+from utill.log_to_window import add_log
 
 
 class event_manager:
