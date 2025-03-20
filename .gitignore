@@ -1,0 +1,9 @@
+/**/__pycache__/
+/__pycache__/
+/.vscode/
+/.venv/
+/user_data.json
+/代码/
+/build/
+/dist/
+/main.spec
