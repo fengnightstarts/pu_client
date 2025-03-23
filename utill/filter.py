@@ -14,6 +14,12 @@ class filter(ABC):
     def filt(self, act: Activity) -> bool:
         pass
 
+    def print(self):
+        print(self.__class__.__name__)
+
+    def super(self):
+        return self
+
 
 class all_true(filter):
     def __init__(self):
@@ -90,7 +96,9 @@ class filter_by_category(filter_super):
     def filt(self, act: Activity) -> bool:
         # print(act.category_name)
         for cate in self.categories:
-            if cate in act.category_name:
+            print(cate + "" + act.category_name)
+            if cate in act.category_name and cate != "":
+                print("True")
                 return super().filt(act)
         return False
 
@@ -112,8 +120,8 @@ class filter_by_tribe(filter_super):
 
     def filt(self, act: Activity) -> bool:
         # print(act.allow_tribe)
-        return (
-            not act.allow_tribe or self.tribe in act.allow_tribe and super().filt(act)
+        return (not act.allow_tribe or self.tribe in act.allow_tribe) and super().filt(
+            act
         )
 
 
@@ -165,13 +173,16 @@ class filt_context:
             if method == filt_method.default_filt:
                 pass
             elif method == filt_method.filt_by_capacity:
+                print("filt_by_capacity")
                 self.filter = filter_by_capacity().decorate(self.filter)
             elif method == filt_method.filt_by_has_join:
                 self.filter = filter_by_has_join().decorate(self.filter)
             elif method == filt_method.filt_by_join_end_time:
                 self.filter = filter_by_join_end_time().decorate(self.filter)
+
             elif method == filt_method.filt_by_category:
                 # print("categotires" + kwargs.get("categories", None))
+                print("categotires" + str(kwargs.get("categories", None)))
                 self.filter = filter_by_category(
                     kwargs.get("categories", None)
                 ).decorate(self.filter)
@@ -184,7 +195,9 @@ class filt_context:
                     self.filter
                 )
             elif method == filt_method.filt_by_tribe:
-                self.filter = filter_by_tribe(kwargs.get("tribe")).decorate(self.filter)
+                self.filter = filter_by_tribe(kwargs.get("tribe", None)).decorate(
+                    self.filter
+                )
             elif method == filt_method.filt_by_join_type:
                 self.filter = filter_by_join_type().decorate(self.filter)
             else:
@@ -206,3 +219,6 @@ class filt_context:
 
     def filt_acts(self, acts: list[Activity]) -> list[Activity]:
         return [act for act in acts if self.filt(act)]
+
+    def print(self):
+        print(self.filt_methods)

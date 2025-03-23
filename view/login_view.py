@@ -1,7 +1,7 @@
 from .ui.login_view_UI import Ui_MainWindow
 from PySide6.QtWidgets import QMainWindow
 from PySide6.QtCore import Signal, Slot
-from utill.bean import User, School, login_method, commands, Message
+from utill.bean import Config, User, School, login_method, commands, Message
 from view.models import SchoolModel
 import app.main
 from PySide6.QtGui import QDesktopServices
@@ -24,10 +24,17 @@ class login_window(QMainWindow):
         self.__bind()
         self.test()
 
-    def load_config(self, user: User):
+    def load_config(self, user: User, cofig: Config):
         self.ui.username_LineEdit.setText(user.username)
         self.ui.password_LineEdit.setText(user.password)
         self.ui.lineEdit.setText(user.get_school_name())
+
+        if cofig.login_method == login_method.auto_login:
+            self.ui.auto_loginRadioButton.setChecked(True)
+        elif cofig.login_method == login_method.use_this_token:
+            self.ui.use_this_token_RadioButton.setChecked(True)
+        else:
+            self.ui.login_on_hand_RadioButton.setChecked(True)
 
     def test(self):
         self.ui.username_LineEdit.setText("202311070403")
@@ -53,13 +60,6 @@ class login_window(QMainWindow):
                 QUrl("https://github.com/fengnightstarts/pu_client/")
             )
         )
-
-        if self.ui.auto_loginRadioButton.isChecked():
-            return login_method.auto_login
-        elif self.ui.use_this_token_RadioButton.isChecked():
-            return login_method.use_this_token
-        else:
-            return login_method.login_on_hand
 
     def __init_comboBox(self):
         self.ui.school_ComboBox.clear()
@@ -111,3 +111,11 @@ class login_window(QMainWindow):
 
     def show_window(self):
         self.show_window_signal.emit()
+
+    def get_login_method(self):
+        if self.ui.auto_loginRadioButton.isChecked():
+            return login_method.auto_login
+        elif self.ui.use_this_token_RadioButton.isChecked():
+            return login_method.use_this_token
+        else:
+            return login_method.login_on_hand

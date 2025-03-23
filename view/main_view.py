@@ -193,6 +193,7 @@ class main_window(QMainWindow):
     @Slot()
     def __filt_acts(self):
         self.__flush_filter_context()
+        self.filt_context.print()
         for act in self.act_dict.values():
             self.__filt_act(act)
 
