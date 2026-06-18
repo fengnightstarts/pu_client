@@ -5,11 +5,13 @@ import view
 import utill
 import app.main
 import view.log_view
+from view.theme import apply_app_style
 
 
 def main():
     q = Queue()
     ap = PySide6.QtWidgets.QApplication()
+    apply_app_style(ap)
     login_window = view.login_view.login_window()
     main_window = view.main_view.main_window()
     log_window = view.log_view.log_window()

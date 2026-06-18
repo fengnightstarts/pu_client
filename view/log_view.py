@@ -4,6 +4,7 @@ from PySide6.QtGui import QAction
 from utill.bean import *
 from .ui.log_view import Ui_MainWindow
 from datetime import datetime
+from .theme import style_log_window
 
 
 class log_window(QMainWindow):
@@ -13,6 +14,7 @@ class log_window(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        style_log_window(self)
         self.__set_context_menu()
         self.__bind()
         self.num = 0

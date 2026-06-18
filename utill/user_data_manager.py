@@ -1,7 +1,7 @@
 import json
 from .bean import *
 
-file_name = "./user_data.json"
+file_name = "user_data.json"
 
 default_user = User("", "").to_dict()
 default_config = Config(
@@ -22,7 +22,6 @@ def save_user_data(user: User, config: Config, file=file_name):
         }
         json.dump(data, f, ensure_ascii=False)
     except Exception as e:
-        print(e)
         raise e
     finally:
         f.close()

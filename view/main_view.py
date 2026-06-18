@@ -1,7 +1,7 @@
 from .ui.act_widget import Ui_act_Widget
 from .ui.main_view import Ui_MainWindow
 from utill import filter
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QMainWindow
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QMainWindow, QStyle
 from PySide6.QtGui import QPixmap, QAction
 from PySide6.QtCore import Qt, Slot, Signal
 from utill.bean import Activity, Message, commands
@@ -11,6 +11,8 @@ from enum import Enum
 import app.main
 from utill import bean
 from PySide6.QtWidgets import QMessageBox
+from .theme import style_activity_card, style_main_window
+from .about_window import show_about_window
 
 
 class widget_type(Enum):
@@ -20,6 +22,21 @@ class widget_type(Enum):
 
 
 img_cache = {}
+
+
+def format_act_info(act: Activity) -> str:
+    capacity_text = f"{act.join_user_count}/{act.allow_user_count}"
+    return (
+        f"{act.name}\n"
+        f"{act.status_name} | {act.category_name} | 学分: {act.credit} | 容量: {capacity_text}\n"
+        f"报名开始: {act.join_start_time}\n"
+        f"报名结束: {act.join_end_time}\n"
+        f"活动时间: {act.start_time} - {act.end_time}\n"
+        f"地点: {act.address or '未填写'}\n"
+        f"已报名: {'是' if act.has_join else '否'} | 报名审核: {'需要' if act.join_type else '不需要'}\n"
+        f"允许学院: {act.allow_college or '全部'}\n"
+        f"允许年级: {act.allow_year or '全部'}"
+    )
 
 
 def get_img_data(url: str):
@@ -34,9 +51,11 @@ class act_widget(QWidget):
         super().__init__()
         self.ui: Ui_act_Widget = Ui_act_Widget()
         self.ui.setupUi(self)
+        style_activity_card(self)
         self.main_window = main_window
         self.act = act
         self.type = type
+        self.setProperty("cardType", type.name)
 
         # 设置活动图片
         pixmap = QPixmap()
@@ -46,23 +65,7 @@ class act_widget(QWidget):
         # self.ui.img_Label.setFixedSize(100, 100)
         self.ui.img_Label.setAlignment(Qt.AlignCenter)
         self.ui.img_Label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        # 设置活动信息
-        info_text = (
-            f"{act.name}\n"
-            f"{act.status_name} "
-            f"{act.category_name} "
-            f"学分: {act.credit}\n"
-            f"报名开始时间: {act.join_start_time}\n"
-            f"报名结束时间: {act.join_end_time}\n"
-            f"活动开始时间: {act.start_time}\n"
-            f"活动结束时间: {act.end_time}\n"
-            f"地址: {act.address} "
-            f"是否已报名: {'是' if act.has_join else '否'}\n"
-            f"允许学院: {act.allow_college or 'all'} \n"
-            f"允许年级: {act.allow_year or 'all'} "
-            f"报名需审核: {'否' if act.join_type else '是'}\n"
-        )
-        self.ui.teinfo_TextEdit.setText(info_text)
+        self.ui.teinfo_TextEdit.setText(format_act_info(act))
         self.ui.teinfo_TextEdit.setReadOnly(True)
         self.__set_contextMenu()
 
@@ -114,6 +117,8 @@ class main_window(QMainWindow):
         super().__init__()
         self.ui: Ui_MainWindow = Ui_MainWindow()
         self.ui.setupUi(self)
+        style_main_window(self)
+        self._about_window = None
         self.act_dict: dict = {}
         self.all_act_widget_dict: dict = {}
         self.filted_act_widget_dict: dict = {}
@@ -142,6 +147,13 @@ class main_window(QMainWindow):
         self.__filt_acts()
 
     def __bind(self):
+        self.github_action = QAction("Star on GitHub", self)
+        self.github_action.setToolTip("Star on GitHub")
+        self.github_action.setIcon(
+            self.style().standardIcon(QStyle.StandardPixmap.SP_DirLinkIcon)
+        )
+        self.github_action.triggered.connect(self.show_about)
+        self.ui.toolBar.addAction(self.github_action)
         self.ui.callegory_pushButton.clicked.connect(self.__add_category)
         self.show_window_signal.connect(lambda: self.show())
         self.close_window_signal.connect(lambda: self.close())
@@ -193,9 +205,9 @@ class main_window(QMainWindow):
     @Slot()
     def __filt_acts(self):
         self.__flush_filter_context()
-        self.filt_context.print()
         for act in self.act_dict.values():
             self.__filt_act(act)
+        self.__refresh_stats()
 
     def __flush_filter_context(self):
         methods = self.get_filt_methods()
@@ -228,6 +240,7 @@ class main_window(QMainWindow):
         elif self.filted_act_widget_dict.get(act.id, None):
             self.filted_act_widget_dict[act.id].deleteLater()
             self.filted_act_widget_dict.pop(act.id)
+        self.__refresh_stats()
 
     def get_grade(self) -> str:
         return self.ui.grade_LineEdit.text()
@@ -290,6 +303,7 @@ class main_window(QMainWindow):
             self.__set_act_widget(
                 self.ui.target_acts_VBoxLayout, act, self.target_act_widget_dict, type
             )
+        self.__refresh_stats()
 
     def del_act_from_target_list(self, act_id):
         self.__del_target_act_widget(act_id)
@@ -301,6 +315,7 @@ class main_window(QMainWindow):
         if self.target_act_widget_dict.get(act_id, None):
             self.target_act_widget_dict[act_id].deleteLater()
             self.target_act_widget_dict.pop(act_id)
+        self.__refresh_stats()
 
     def del_target_act_widget(self, act_id):
         self.del_target_act_widget_signal.emit(act_id)
@@ -315,3 +330,14 @@ class main_window(QMainWindow):
 
     def open_message_window(self, title: str, message: str):
         self.open_message_window_signal.emit(title, message)
+
+    def show_about(self):
+        self._about_window = show_about_window(self)
+
+    def __refresh_stats(self):
+        labels = getattr(self, "_stats_labels", None)
+        if not labels:
+            return
+        labels["all"].setText(str(len(self.all_act_widget_dict)))
+        labels["filtered"].setText(str(len(self.filted_act_widget_dict)))
+        labels["target"].setText(str(len(self.target_act_widget_dict)))
